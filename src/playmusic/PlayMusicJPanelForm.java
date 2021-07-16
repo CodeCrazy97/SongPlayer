@@ -5,15 +5,46 @@
  */
 package playmusic;
 
+import static com.sun.xml.internal.fastinfoset.alphabet.BuiltInRestrictedAlphabets.table;
 import java.awt.BorderLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.FocusAdapter;
+import java.awt.event.FocusEvent;
 import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.sound.sampled.AudioFormat;
+import javax.sound.sampled.AudioInputStream;
+import javax.sound.sampled.AudioSystem;
+import javax.sound.sampled.UnsupportedAudioFileException;
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JScrollPane;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
+import javax.swing.event.TableModelListener;
 import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableColumn;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JOptionPane;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 
 /**
  *
@@ -22,7 +53,9 @@ import javax.swing.table.DefaultTableModel;
 public class PlayMusicJPanelForm extends javax.swing.JPanel {
 
     public Database db;
-    
+    public DefaultTableModel tableModel;
+    public String defaultDirectory;
+
     /**
      * Creates new form PlayMusicJPanelForm
      */
@@ -33,12 +66,72 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
         db = new Database();
         Connection conn = db.connect();
 
-        String baseDirectory = db.getBaseDirectory();
-        if (baseDirectory != null) {
-            jButton1.setText(baseDirectory);
+        defaultDirectory = db.getBaseDirectory();
+        if (defaultDirectory != null) {
+            baseDirButton.setText(defaultDirectory);
         }
+
+        tableModel = (DefaultTableModel) jTable1.getModel();
+        //jTable1.setModel(tableModel);
+       
+        //jTable1.setColumnModel(columnModel);
+//        
+//        //instance table model
+//        tableModel = new DefaultTableModel() {
+//
+//            @Override
+//            public boolean isCellEditable(int row, int column) {
+//                //all cells false
+//                return false;
+//            }
+//        };
+//
+//        jTable1.setModel(tableModel);
+
+//        Object[] abc = new Object[4];
+//        abc[0] = "File name";
+//        abc[1] = "Length";
+//        abc[2] = "Rating";
+//        abc[3] = "Number of Plays";
+//        tableModel = new DefaultTableModel(abc, 100);
+//        jTable1 = new JTable(tableModel) {
+//            public boolean isCellEditable(int rowIndex, int colIndex) {
+//                return false; //Disallow the editing of any cell
+//            }
+//        };
+        listFiles(defaultDirectory);
+
+        TableColumn column1 = jTable1.getColumnModel().getColumn(0);
+        column1.setPreferredWidth(700);
+        TableColumn column4 = jTable1.getColumnModel().getColumn(3);
+        column4.setPreferredWidth(100);
+
+
+//        if (jTable1.isEditing()) {
+//            System.out.println("112");
+//            jTable1.getCellEditor().stopCellEditing();
+//        }
+//
+//        jTable1.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
+//        jTable1.putClientProperty("terminateEditOnFocusGained", Boolean.TRUE);
         
-        DefaultTableModel table = (DefaultTableModel) jTable1.getModel();
+//        jTable1 = new JTable(row, column) {
+//            public boolean isCellEditable(int row, int column) {
+//                return false;
+//            }
+//        };
+//        DefaultTableModel tableModel = new DefaultTableModel() {
+//
+//            @Override
+//            public boolean isCellEditable(int row, int column) {
+//                //Only the third column
+//                return false;
+//            }
+//        };
+//
+//        jTable1.setModel(tableModel);
+        //displaySongInfo();
+        //column.setMaxWidth(175);
         //String[] row4 = {"Column04","Data04"};
 //        table.addColumn("Title");
 //        table.addColumn("Length");
@@ -60,7 +153,14 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
         jScrollPane1 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jLabel2 = new javax.swing.JLabel();
-        jButton1 = new javax.swing.JButton();
+        baseDirButton = new javax.swing.JButton();
+        jLabel3 = new javax.swing.JLabel();
+        jLabel4 = new javax.swing.JLabel();
+        titlejTextField = new javax.swing.JTextField();
+        ratingjComboBox = new javax.swing.JComboBox<>();
+        updateSongjButton = new javax.swing.JButton();
+        canceljButton = new javax.swing.JButton();
+        clearRatingsjButton = new javax.swing.JButton();
 
         jLabel1.setText("Songs");
 
@@ -72,18 +172,89 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
                 {null, null, null, null}
             },
             new String [] {
-                "Title", "Length", "Rating", "Number of Plays"
+                "Title", "Length", "Rating", "# of Plays"
             }
-        ));
+        ) {
+            boolean[] canEdit = new boolean [] {
+                false, false, false, false
+            };
+
+            public boolean isCellEditable(int rowIndex, int columnIndex) {
+                return canEdit [columnIndex];
+            }
+        });
+        jTable1.addFocusListener(new java.awt.event.FocusAdapter() {
+            public void focusGained(java.awt.event.FocusEvent evt) {
+                jTable1FocusGained(evt);
+            }
+        });
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                jTable1MouseClicked(evt);
+            }
+        });
+        jTable1.addInputMethodListener(new java.awt.event.InputMethodListener() {
+            public void caretPositionChanged(java.awt.event.InputMethodEvent evt) {
+                jTable1CaretPositionChanged(evt);
+            }
+            public void inputMethodTextChanged(java.awt.event.InputMethodEvent evt) {
+                jTable1InputMethodTextChanged(evt);
+            }
+        });
+        jTable1.addPropertyChangeListener(new java.beans.PropertyChangeListener() {
+            public void propertyChange(java.beans.PropertyChangeEvent evt) {
+                jTable1PropertyChange(evt);
+            }
+        });
+        jTable1.addKeyListener(new java.awt.event.KeyAdapter() {
+            public void keyPressed(java.awt.event.KeyEvent evt) {
+                jTable1KeyPressed(evt);
+            }
+            public void keyReleased(java.awt.event.KeyEvent evt) {
+                jTable1KeyReleased(evt);
+            }
+            public void keyTyped(java.awt.event.KeyEvent evt) {
+                jTable1KeyTyped(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
 
         jLabel2.setText("Base Directory:");
 
-        jButton1.setText("Pick a Directory");
-        jButton1.setActionCommand("Pick a Directory");
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        baseDirButton.setText("Pick a Directory");
+        baseDirButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                baseDirButtonActionPerformed(evt);
+            }
+        });
+
+        jLabel3.setText("Title:");
+
+        jLabel4.setText("Rating:");
+
+        titlejTextField.setText("titlejTextField");
+        titlejTextField.setName("titlejTextField"); // NOI18N
+
+        ratingjComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Unrated", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }));
+
+        updateSongjButton.setText("Update");
+        updateSongjButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                updateSongjButtonActionPerformed(evt);
+            }
+        });
+
+        canceljButton.setLabel("Cancel");
+        canceljButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                canceljButtonActionPerformed(evt);
+            }
+        });
+
+        clearRatingsjButton.setText("Clear Ratings");
+        clearRatingsjButton.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                clearRatingsjButtonActionPerformed(evt);
             }
         });
 
@@ -94,13 +265,29 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addGroup(layout.createSequentialGroup()
+                        .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 529, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(18, 18, 18)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addComponent(jLabel3)
+                            .addComponent(jLabel4))
+                        .addGap(29, 29, 29)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(ratingjComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addGap(18, 18, 18)
+                                .addComponent(updateSongjButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addComponent(canceljButton))
+                            .addComponent(titlejTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jLabel1)
-                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 529, javax.swing.GroupLayout.PREFERRED_SIZE)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton1)))
-                .addContainerGap(66, Short.MAX_VALUE))
+                        .addComponent(baseDirButton)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addComponent(clearRatingsjButton)))
+                .addContainerGap(42, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -108,42 +295,242 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
                 .addContainerGap()
                 .addComponent(jLabel1)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 362, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 362, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(layout.createSequentialGroup()
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel3)
+                            .addComponent(titlejTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(jLabel4)
+                            .addComponent(ratingjComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(updateSongjButton)
+                            .addComponent(canceljButton))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
-                    .addComponent(jButton1))
+                    .addComponent(baseDirButton)
+                    .addComponent(clearRatingsjButton))
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
+
+        jLabel3.getAccessibleContext().setAccessibleName("titlejLabel");
+        jLabel3.getAccessibleContext().setAccessibleDescription("");
+        jLabel4.getAccessibleContext().setAccessibleName("ratingjLabel");
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void baseDirButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_baseDirButtonActionPerformed
 
         JFileChooser chooser = new JFileChooser();
-        chooser.setCurrentDirectory(new java.io.File("."));
-        chooser.setDialogTitle("choosertitle");
+
+        // Try starting the directory picker in the Music folder, but if we can't find that, then just use the home directory.
+        try {
+            chooser.setCurrentDirectory(new java.io.File(System.getProperty("user.home") + "/Music"));
+        } catch (Exception e) {
+            chooser.setCurrentDirectory(new java.io.File(System.getProperty("user.home")));
+        }
+        chooser.setDialogTitle("Music Folder Finder");
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         chooser.setAcceptAllFileFilterUsed(false);
 
+        String directoryPath = baseDirButton.getText();
         if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-            System.out.println("getCurrentDirectory(): " + chooser.getCurrentDirectory());
-            System.out.println("getSelectedFile() : " + chooser.getSelectedFile());
-            db.updateBaseDirectory(chooser.getSelectedFile().toString());
+            directoryPath = chooser.getSelectedFile().toString();
+            db.updateBaseDirectory(directoryPath);
+            baseDirButton.setText(directoryPath);
+            listFiles(directoryPath);
         } else {
             System.out.println("No Selection ");
         }
+
+    }//GEN-LAST:event_baseDirButtonActionPerformed
+
+    private void displaySongInfo() {
+        try {
+            titlejTextField.setText(jTable1.getValueAt(jTable1.getSelectedRow(), 0).toString());
+            // figure out the rating of the song
+            String ratingOfSelectedSong = jTable1.getValueAt(jTable1.getSelectedRow(), 2).toString();
+            if (ratingOfSelectedSong.equals("N/A")) {
+                ratingjComboBox.setSelectedIndex(0);
+            } else {
+                ratingjComboBox.setSelectedIndex(Integer.parseInt(ratingOfSelectedSong) + 1);
+            }
+        } catch (Exception e) {
+            System.out.println("Caught an exception trying to display the selected song.");
+        }
+    }
+
+    private void jTable1MouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseClicked
+        displaySongInfo();
+    }//GEN-LAST:event_jTable1MouseClicked
+
+    private void canceljButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_canceljButtonActionPerformed
+        titlejTextField.setText(jTable1.getValueAt(jTable1.getSelectedRow(), 0).toString());
+        // figure out the rating of the song
+        String ratingOfSelectedSong = jTable1.getValueAt(jTable1.getSelectedRow(), 2).toString();
+        if (ratingOfSelectedSong.equals("N/A")) {
+            ratingjComboBox.setSelectedIndex(0);
+        } else {
+            ratingjComboBox.setSelectedIndex(Integer.parseInt(ratingOfSelectedSong) + 1);
+        }
+    }//GEN-LAST:event_canceljButtonActionPerformed
+
+    private void updateSongjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateSongjButtonActionPerformed
         
-    }//GEN-LAST:event_jButton1ActionPerformed
+        String updatedFileName = titlejTextField.getText();
+        char[] illegalChars = new char[9];
+        illegalChars[0] = '/';
+        illegalChars[1] = '\\';
+        illegalChars[2] = ':';
+        illegalChars[3] = '*';
+        illegalChars[4] = '?';
+        illegalChars[5] = '"';
+        illegalChars[6] = '<';
+        illegalChars[7] = '>';
+        illegalChars[8] = '|';
+        for (int i = 0; i < illegalChars.length; i++) {
+            if (updatedFileName.contains("" + illegalChars[i])) {
+                JOptionPane.showMessageDialog(null, "An illegal character is in the filname.", "Illegal Input", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+        }
+        int updatedRating = ratingjComboBox.getSelectedIndex() - 1;
+        if (db.updateSong(defaultDirectory + "\\" + jTable1.getValueAt(jTable1.getSelectedRow(), jTable1.getSelectedColumn()).toString(), defaultDirectory + "\\" + updatedFileName, updatedRating)) {
+//            System.out.println(jTable1.getSelectedRow());
+//            System.out.println(jTable1.getSelectedColumn());
+            jTable1.setValueAt(updatedFileName, jTable1.getSelectedRow(), 0);
+
+            if (updatedRating == -1) {
+                jTable1.setValueAt("N/A", jTable1.getSelectedRow(), 2);
+            } else {
+                jTable1.setValueAt(updatedRating, jTable1.getSelectedRow(), 2);
+            }
+        } else {
+            JOptionPane.showMessageDialog(null, "There was an error updating the song.", "Error Updating Song", JOptionPane.ERROR_MESSAGE);
+        }
+
+    }//GEN-LAST:event_updateSongjButtonActionPerformed
+
+    private void clearRatingsjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearRatingsjButtonActionPerformed
+        Object[] options1 = {"Reset for Current Directory", "Reset for All Directories",
+            "Cancel"};
+
+        JPanel panel = new JPanel();
+        panel.add(new JLabel("Would you like to remove the ratings for the current directory or all directories?"));
+
+        int result = JOptionPane.showOptionDialog(null, panel, "Enter a Number",
+                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
+                null, options1, null);
+        if (result == 0) {
+            if (db.resetSongRatings(false)) {
+                JOptionPane.showMessageDialog(null, "The song ratings for all directories have been successfully reset.", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "There was a problem resetting the song ratings for all directories.", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+
+        } else if (result == 1) {
+            if (db.resetSongRatings(true)) {
+                JOptionPane.showMessageDialog(null, "The song ratings for " + db.getBaseDirectory() + " have been successfully reset.", "Success", JOptionPane.INFORMATION_MESSAGE);
+            } else {
+                JOptionPane.showMessageDialog(null, "There was a problem resetting the song ratings for " + db.getBaseDirectory() + ".", "Error", JOptionPane.ERROR_MESSAGE);
+            }
+        }
+    }//GEN-LAST:event_clearRatingsjButtonActionPerformed
+
+    private void jTable1PropertyChange(java.beans.PropertyChangeEvent evt) {//GEN-FIRST:event_jTable1PropertyChange
+
+    }//GEN-LAST:event_jTable1PropertyChange
+
+    private void jTable1InputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_jTable1InputMethodTextChanged
+ 
+    }//GEN-LAST:event_jTable1InputMethodTextChanged
+
+    private void jTable1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyReleased
+
+        
+    }//GEN-LAST:event_jTable1KeyReleased
+
+    private void jTable1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyTyped
+
+    }//GEN-LAST:event_jTable1KeyTyped
+
+    private void jTable1KeyPressed(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyPressed
+
+    }//GEN-LAST:event_jTable1KeyPressed
+
+    private void jTable1CaretPositionChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_jTable1CaretPositionChanged
+
+    }//GEN-LAST:event_jTable1CaretPositionChanged
+
+    private void jTable1FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTable1FocusGained
+
+    }//GEN-LAST:event_jTable1FocusGained
 
     // Get the files.
-    public void getFiles(String myDirectoryPath) {
+    public void listFiles(String myDirectoryPath) {
+        tableModel.getDataVector().removeAllElements();
+
+        LinkedList<Song> songsInDb = db.getSongFiles(myDirectoryPath); //new LinkedList<Song>();
         File dir = new File(myDirectoryPath);
         File[] directoryListing = dir.listFiles();
         if (directoryListing != null) {
-            for (File child : directoryListing) {
 
-                // Do something with child
+//            Object[][] songsObject = new Object[directoryListing.length][4];
+//            int index = 0;
+            for (File child : directoryListing) {
+                String[] audioFileTypes = new String[]{".wav", ".mp3", ".mp4", ".m4a"};
+                List<String> audioFileTypesList = new ArrayList<>(Arrays.asList(audioFileTypes));
+                String fileName = child.getName();
+
+                // set the filetype
+                String fileType = "";
+                if (fileName.length() > 0 && fileName.contains(".")) {
+                    fileType = fileName.substring(fileName.lastIndexOf("."));
+                }
+                if (fileType.length() > 0 && audioFileTypesList.contains(fileType)) { // is a music file
+
+//                    // get the length of the music file
+//                    AudioInputStream audioInputStream = null;
+//                    try {
+//                        File f = new File(child.getAbsolutePath());
+//                        audioInputStream = AudioSystem.getAudioInputStream(f);
+//                    } catch (UnsupportedAudioFileException ex) {
+//                        System.out.println("Error 175: " + ex.getMessage());
+//                    } catch (IOException ex) {
+//                        System.out.println("Error 180: " + ex.getMessage());
+//                    }
+//                    AudioFormat format = audioInputStream.getFormat();
+//                    long frames = audioInputStream.getFrameLength();
+//                    double durationInSeconds = (frames + 0.0) / format.getFrameRate();
+//
+//                    System.out.println("Length: " + durationInSeconds);
+                    //db.updateSong(child.getAbsolutePath(), -1, 0);
+                    int songIndex = getSongIndex(songsInDb, child.getAbsolutePath());
+                    if (songIndex != -1) { // show the data (rating, num of plays)
+//                        songsObject[index][0] = child.getName();
+//                        songsObject[index][1] = "" + songsInDb.get(songIndex).getRating();
+//                        songsObject[index][2] = "" + songsInDb.get(songIndex).getNumberOfPlays();
+//                        songsObject[index][3] = "0";
+                        tableModel.addRow(new Object[]{child.getName(), "TBD", songsInDb.get(songIndex).getRating(), "0"});
+                    } else { // just list the file name, no data has been recorded
+//                        songsObject[index][0] = child.getName();
+//                        songsObject[index][1] = "NA";
+//                        songsObject[index][2] = "0";
+//                        songsObject[index][3] = "0";
+                        tableModel.addRow(new Object[]{child.getName(), "TBD", "N/A", "0"});
+                    }
+                }
+
+                //index++;
             }
+
+//            DefaultTableModel model = new DefaultTableModel(songsObject, 4);
+//            jTable1 = new JTable(model) {
+//                public boolean isCellEditable(int rowIndex, int colIndex) {
+//                    return false; //Disallow the editing of any cell
+//                }
+//            };
         } else {
             // Handle the case where dir is not really a directory.
             // Checking dir.isDirectory() above would not be sufficient
@@ -152,11 +539,27 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
         }
     }
 
+    public int getSongIndex(LinkedList<Song> songs, String fileName) {
+        for (Song s : songs) {
+            if (s.getFilename().equals(fileName)) {
+                return songs.indexOf(s);
+            }
+        }
+        return -1;
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton baseDirButton;
+    private javax.swing.JButton canceljButton;
+    private javax.swing.JButton clearRatingsjButton;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
+    private javax.swing.JLabel jLabel3;
+    private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
+    private javax.swing.JComboBox<String> ratingjComboBox;
+    private javax.swing.JTextField titlejTextField;
+    private javax.swing.JButton updateSongjButton;
     // End of variables declaration//GEN-END:variables
 }
