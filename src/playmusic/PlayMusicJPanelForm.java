@@ -63,81 +63,33 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
         initComponents();
 
         // Try connecting to the music database. If it doesn't exist, create it.
-        db = new Database();
-        Connection conn = db.connect();
+        db
+                = new Database();
+        Connection conn
+                = db.connect();
 
-        defaultDirectory = db.getBaseDirectory();
+        defaultDirectory
+                = db.getBaseDirectory();
         if (defaultDirectory != null) {
             baseDirButton.setText(defaultDirectory);
         }
 
-        tableModel = (DefaultTableModel) jTable1.getModel();
-        //jTable1.setModel(tableModel);
-       
-        //jTable1.setColumnModel(columnModel);
-//        
-//        //instance table model
-//        tableModel = new DefaultTableModel() {
-//
-//            @Override
-//            public boolean isCellEditable(int row, int column) {
-//                //all cells false
-//                return false;
-//            }
-//        };
-//
-//        jTable1.setModel(tableModel);
+        tableModel
+                = (DefaultTableModel) jTable1.getModel();
 
-//        Object[] abc = new Object[4];
-//        abc[0] = "File name";
-//        abc[1] = "Length";
-//        abc[2] = "Rating";
-//        abc[3] = "Number of Plays";
-//        tableModel = new DefaultTableModel(abc, 100);
-//        jTable1 = new JTable(tableModel) {
-//            public boolean isCellEditable(int rowIndex, int colIndex) {
-//                return false; //Disallow the editing of any cell
-//            }
-//        };
         listFiles(defaultDirectory);
 
-        TableColumn column1 = jTable1.getColumnModel().getColumn(0);
+        TableColumn column1
+                = jTable1.getColumnModel().
+                getColumn(0);
         column1.setPreferredWidth(700);
-        TableColumn column4 = jTable1.getColumnModel().getColumn(3);
+        TableColumn column4
+                = jTable1.getColumnModel().
+                getColumn(3);
         column4.setPreferredWidth(100);
-
-
-//        if (jTable1.isEditing()) {
-//            System.out.println("112");
-//            jTable1.getCellEditor().stopCellEditing();
-//        }
-//
-//        jTable1.putClientProperty("terminateEditOnFocusLost", Boolean.TRUE);
-//        jTable1.putClientProperty("terminateEditOnFocusGained", Boolean.TRUE);
         
-//        jTable1 = new JTable(row, column) {
-//            public boolean isCellEditable(int row, int column) {
-//                return false;
-//            }
-//        };
-//        DefaultTableModel tableModel = new DefaultTableModel() {
-//
-//            @Override
-//            public boolean isCellEditable(int row, int column) {
-//                //Only the third column
-//                return false;
-//            }
-//        };
-//
-//        jTable1.setModel(tableModel);
-        //displaySongInfo();
-        //column.setMaxWidth(175);
-        //String[] row4 = {"Column04","Data04"};
-//        table.addColumn("Title");
-//        table.addColumn("Length");
-//        table.addColumn("Rating");
-//        table.addColumn("Number of Plays");
-        //table.addRow(row4);
+        jTable1.setAutoCreateRowSorter(true);
+
     }
 
     /**
@@ -322,24 +274,31 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
 
     private void baseDirButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_baseDirButtonActionPerformed
 
-        JFileChooser chooser = new JFileChooser();
+        JFileChooser chooser
+                = new JFileChooser();
 
         // Try starting the directory picker in the Music folder, but if we can't find that, then just use the home directory.
         try {
-            chooser.setCurrentDirectory(new java.io.File(System.getProperty("user.home") + "/Music"));
+            chooser.setCurrentDirectory(new java.io.File(System.getProperty(
+                    "user.home") + "/Music"));
         } catch (Exception e) {
-            chooser.setCurrentDirectory(new java.io.File(System.getProperty("user.home")));
+            chooser.setCurrentDirectory(new java.io.File(System.getProperty(
+                    "user.home")));
         }
         chooser.setDialogTitle("Music Folder Finder");
         chooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         chooser.setAcceptAllFileFilterUsed(false);
 
-        String directoryPath = baseDirButton.getText();
+        String directoryPath
+                = baseDirButton.getText();
         if (chooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
-            directoryPath = chooser.getSelectedFile().toString();
+            directoryPath
+                    = chooser.getSelectedFile().
+                    toString();
             db.updateBaseDirectory(directoryPath);
             baseDirButton.setText(directoryPath);
             listFiles(directoryPath);
+            defaultDirectory = directoryPath;
         } else {
             System.out.println("No Selection ");
         }
@@ -348,16 +307,23 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
 
     private void displaySongInfo() {
         try {
-            titlejTextField.setText(jTable1.getValueAt(jTable1.getSelectedRow(), 0).toString());
+            titlejTextField.setText(jTable1.getValueAt(jTable1.getSelectedRow(),
+                    0).
+                    toString());
             // figure out the rating of the song
-            String ratingOfSelectedSong = jTable1.getValueAt(jTable1.getSelectedRow(), 2).toString();
+            String ratingOfSelectedSong
+                    = jTable1.getValueAt(jTable1.getSelectedRow(),
+                            2).
+                    toString();
             if (ratingOfSelectedSong.equals("N/A")) {
                 ratingjComboBox.setSelectedIndex(0);
             } else {
-                ratingjComboBox.setSelectedIndex(Integer.parseInt(ratingOfSelectedSong) + 1);
+                ratingjComboBox.setSelectedIndex(Integer.parseInt(
+                        ratingOfSelectedSong) + 1);
             }
         } catch (Exception e) {
-            System.out.println("Caught an exception trying to display the selected song.");
+            System.out.println(
+                    "Caught an exception trying to display the selected song.");
         }
     }
 
@@ -366,74 +332,137 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
     }//GEN-LAST:event_jTable1MouseClicked
 
     private void canceljButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_canceljButtonActionPerformed
-        titlejTextField.setText(jTable1.getValueAt(jTable1.getSelectedRow(), 0).toString());
+        titlejTextField.setText(jTable1.getValueAt(jTable1.getSelectedRow(),
+                0).
+                toString());
         // figure out the rating of the song
-        String ratingOfSelectedSong = jTable1.getValueAt(jTable1.getSelectedRow(), 2).toString();
+        String ratingOfSelectedSong
+                = jTable1.getValueAt(jTable1.getSelectedRow(),
+                        2).
+                toString();
         if (ratingOfSelectedSong.equals("N/A")) {
             ratingjComboBox.setSelectedIndex(0);
         } else {
-            ratingjComboBox.setSelectedIndex(Integer.parseInt(ratingOfSelectedSong) + 1);
+            ratingjComboBox.setSelectedIndex(Integer.parseInt(
+                    ratingOfSelectedSong) + 1);
         }
     }//GEN-LAST:event_canceljButtonActionPerformed
 
     private void updateSongjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateSongjButtonActionPerformed
-        
-        String updatedFileName = titlejTextField.getText();
-        char[] illegalChars = new char[9];
-        illegalChars[0] = '/';
-        illegalChars[1] = '\\';
-        illegalChars[2] = ':';
-        illegalChars[3] = '*';
-        illegalChars[4] = '?';
-        illegalChars[5] = '"';
-        illegalChars[6] = '<';
-        illegalChars[7] = '>';
-        illegalChars[8] = '|';
-        for (int i = 0; i < illegalChars.length; i++) {
+
+        String updatedFileName
+                = titlejTextField.getText();
+        char[] illegalChars
+                = new char[9];
+        illegalChars[0]
+                = '/';
+        illegalChars[1]
+                = '\\';
+        illegalChars[2]
+                = ':';
+        illegalChars[3]
+                = '*';
+        illegalChars[4]
+                = '?';
+        illegalChars[5]
+                = '"';
+        illegalChars[6]
+                = '<';
+        illegalChars[7]
+                = '>';
+        illegalChars[8]
+                = '|';
+        for (int i
+                = 0;
+                i < illegalChars.length;
+                i++) {
             if (updatedFileName.contains("" + illegalChars[i])) {
-                JOptionPane.showMessageDialog(null, "An illegal character is in the filname.", "Illegal Input", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(null,
+                        "An illegal character is in the filname.",
+                        "Illegal Input",
+                        JOptionPane.WARNING_MESSAGE);
                 return;
             }
         }
-        int updatedRating = ratingjComboBox.getSelectedIndex() - 1;
-        if (db.updateSong(defaultDirectory + "\\" + jTable1.getValueAt(jTable1.getSelectedRow(), jTable1.getSelectedColumn()).toString(), defaultDirectory + "\\" + updatedFileName, updatedRating)) {
+        int updatedRating
+                = ratingjComboBox.getSelectedIndex() - 1;
+        if (db.updateSong(defaultDirectory + "\\" + jTable1.getValueAt(jTable1.
+                getSelectedRow(),
+                jTable1.getSelectedColumn()).
+                toString(),
+                defaultDirectory + "\\" + updatedFileName,
+                updatedRating)) {
 //            System.out.println(jTable1.getSelectedRow());
 //            System.out.println(jTable1.getSelectedColumn());
-            jTable1.setValueAt(updatedFileName, jTable1.getSelectedRow(), 0);
+            jTable1.setValueAt(updatedFileName,
+                    jTable1.getSelectedRow(),
+                    0);
 
             if (updatedRating == -1) {
-                jTable1.setValueAt("N/A", jTable1.getSelectedRow(), 2);
+                jTable1.setValueAt("N/A",
+                        jTable1.getSelectedRow(),
+                        2);
             } else {
-                jTable1.setValueAt(updatedRating, jTable1.getSelectedRow(), 2);
+                jTable1.setValueAt(updatedRating,
+                        jTable1.getSelectedRow(),
+                        2);
             }
         } else {
-            JOptionPane.showMessageDialog(null, "There was an error updating the song.", "Error Updating Song", JOptionPane.ERROR_MESSAGE);
+            JOptionPane.showMessageDialog(null,
+                    "There was an error updating the song.",
+                    "Error Updating Song",
+                    JOptionPane.ERROR_MESSAGE);
         }
 
     }//GEN-LAST:event_updateSongjButtonActionPerformed
 
     private void clearRatingsjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearRatingsjButtonActionPerformed
-        Object[] options1 = {"Reset for Current Directory", "Reset for All Directories",
-            "Cancel"};
+        Object[] options1
+                = {"Reset for Current Directory",
+                    "Reset for All Directories",
+                    "Cancel"};
 
-        JPanel panel = new JPanel();
-        panel.add(new JLabel("Would you like to remove the ratings for the current directory or all directories?"));
+        JPanel panel
+                = new JPanel();
+        panel.add(new JLabel(
+                "Would you like to remove the ratings for the current directory or all directories?"));
 
-        int result = JOptionPane.showOptionDialog(null, panel, "Enter a Number",
-                JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.PLAIN_MESSAGE,
-                null, options1, null);
+        int result
+                = JOptionPane.showOptionDialog(null,
+                        panel,
+                        "Enter a Number",
+                        JOptionPane.YES_NO_CANCEL_OPTION,
+                        JOptionPane.PLAIN_MESSAGE,
+                        null,
+                        options1,
+                        null);
         if (result == 0) {
             if (db.resetSongRatings(false)) {
-                JOptionPane.showMessageDialog(null, "The song ratings for all directories have been successfully reset.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                listFiles(defaultDirectory);
+                JOptionPane.showMessageDialog(null,
+                        "The song ratings for all directories have been successfully reset.",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(null, "There was a problem resetting the song ratings for all directories.", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null,
+                        "There was a problem resetting the song ratings for all directories.",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
 
         } else if (result == 1) {
             if (db.resetSongRatings(true)) {
-                JOptionPane.showMessageDialog(null, "The song ratings for " + db.getBaseDirectory() + " have been successfully reset.", "Success", JOptionPane.INFORMATION_MESSAGE);
+                listFiles(defaultDirectory);
+                JOptionPane.showMessageDialog(null,
+                        "The song ratings for " + db.getBaseDirectory() + " have been successfully reset.",
+                        "Success",
+                        JOptionPane.INFORMATION_MESSAGE);
             } else {
-                JOptionPane.showMessageDialog(null, "There was a problem resetting the song ratings for " + db.getBaseDirectory() + ".", "Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null,
+                        "There was a problem resetting the song ratings for " + db.
+                        getBaseDirectory() + ".",
+                        "Error",
+                        JOptionPane.ERROR_MESSAGE);
             }
         }
     }//GEN-LAST:event_clearRatingsjButtonActionPerformed
@@ -443,12 +472,12 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
     }//GEN-LAST:event_jTable1PropertyChange
 
     private void jTable1InputMethodTextChanged(java.awt.event.InputMethodEvent evt) {//GEN-FIRST:event_jTable1InputMethodTextChanged
- 
+
     }//GEN-LAST:event_jTable1InputMethodTextChanged
 
     private void jTable1KeyReleased(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyReleased
 
-        
+
     }//GEN-LAST:event_jTable1KeyReleased
 
     private void jTable1KeyTyped(java.awt.event.KeyEvent evt) {//GEN-FIRST:event_jTable1KeyTyped
@@ -469,26 +498,40 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
 
     // Get the files.
     public void listFiles(String myDirectoryPath) {
-        tableModel.getDataVector().removeAllElements();
+        tableModel.getDataVector().
+                removeAllElements();
 
-        LinkedList<Song> songsInDb = db.getSongFiles(myDirectoryPath); //new LinkedList<Song>();
-        File dir = new File(myDirectoryPath);
-        File[] directoryListing = dir.listFiles();
+        LinkedList<Song> songsInDb
+                = db.getSongFiles(myDirectoryPath); //new LinkedList<Song>();
+        File dir
+                = new File(myDirectoryPath);
+        File[] directoryListing
+                = dir.listFiles();
         if (directoryListing != null) {
 
 //            Object[][] songsObject = new Object[directoryListing.length][4];
 //            int index = 0;
-            for (File child : directoryListing) {
-                String[] audioFileTypes = new String[]{".wav", ".mp3", ".mp4", ".m4a"};
-                List<String> audioFileTypesList = new ArrayList<>(Arrays.asList(audioFileTypes));
-                String fileName = child.getName();
+            for (File child
+                    : directoryListing) {
+                String[] audioFileTypes
+                        = new String[]{".wav",
+                            ".mp3",
+                            ".mp4",
+                            ".m4a"};
+                List<String> audioFileTypesList
+                        = new ArrayList<>(Arrays.asList(audioFileTypes));
+                String fileName
+                        = child.getName();
 
                 // set the filetype
-                String fileType = "";
+                String fileType
+                        = "";
                 if (fileName.length() > 0 && fileName.contains(".")) {
-                    fileType = fileName.substring(fileName.lastIndexOf("."));
+                    fileType
+                            = fileName.substring(fileName.lastIndexOf("."));
                 }
-                if (fileType.length() > 0 && audioFileTypesList.contains(fileType)) { // is a music file
+                if (fileType.length() > 0 && audioFileTypesList.contains(
+                        fileType)) { // is a music file
 
 //                    // get the length of the music file
 //                    AudioInputStream audioInputStream = null;
@@ -506,19 +549,28 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
 //
 //                    System.out.println("Length: " + durationInSeconds);
                     //db.updateSong(child.getAbsolutePath(), -1, 0);
-                    int songIndex = getSongIndex(songsInDb, child.getAbsolutePath());
+                    int songIndex
+                            = getSongIndex(songsInDb,
+                                    child.getAbsolutePath());
                     if (songIndex != -1) { // show the data (rating, num of plays)
 //                        songsObject[index][0] = child.getName();
 //                        songsObject[index][1] = "" + songsInDb.get(songIndex).getRating();
 //                        songsObject[index][2] = "" + songsInDb.get(songIndex).getNumberOfPlays();
 //                        songsObject[index][3] = "0";
-                        tableModel.addRow(new Object[]{child.getName(), "TBD", songsInDb.get(songIndex).getRating(), "0"});
+                        tableModel.addRow(new Object[]{child.getName(),
+                            "TBD",
+                            songsInDb.get(songIndex).
+                            getRating(),
+                            "0"});
                     } else { // just list the file name, no data has been recorded
 //                        songsObject[index][0] = child.getName();
 //                        songsObject[index][1] = "NA";
 //                        songsObject[index][2] = "0";
 //                        songsObject[index][3] = "0";
-                        tableModel.addRow(new Object[]{child.getName(), "TBD", "N/A", "0"});
+                        tableModel.addRow(new Object[]{child.getName(),
+                            "TBD",
+                            "N/A",
+                            "0"});
                     }
                 }
 
@@ -539,9 +591,12 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
         }
     }
 
-    public int getSongIndex(LinkedList<Song> songs, String fileName) {
-        for (Song s : songs) {
-            if (s.getFilename().equals(fileName)) {
+    public int getSongIndex(LinkedList<Song> songs,
+            String fileName) {
+        for (Song s
+                : songs) {
+            if (s.getFilename().
+                    equals(fileName)) {
                 return songs.indexOf(s);
             }
         }
