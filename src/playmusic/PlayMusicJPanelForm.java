@@ -19,6 +19,7 @@ import java.util.HashMap;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Random;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.sound.sampled.AudioFormat;
@@ -87,8 +88,23 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
                 = jTable1.getColumnModel().
                 getColumn(3);
         column4.setPreferredWidth(100);
-        
+
         jTable1.setAutoCreateRowSorter(true);
+
+        // randomly select one of the rows
+        //jTable1.getRowCount();
+        Random r
+                = new Random();
+        int low
+                = 0;
+        int high
+                = jTable1.getRowCount() - 1;
+        int result
+                = r.nextInt(high - low) + low;
+
+        jTable1.setRowSelectionInterval(result,
+                result);
+        displaySongInfo();
 
     }
 
@@ -110,7 +126,7 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
         jLabel4 = new javax.swing.JLabel();
         titlejTextField = new javax.swing.JTextField();
         ratingjComboBox = new javax.swing.JComboBox<>();
-        updateSongjButton = new javax.swing.JButton();
+        renameSongjButton = new javax.swing.JButton();
         canceljButton = new javax.swing.JButton();
         clearRatingsjButton = new javax.swing.JButton();
 
@@ -189,10 +205,10 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
 
         ratingjComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Unrated", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }));
 
-        updateSongjButton.setText("Update");
-        updateSongjButton.addActionListener(new java.awt.event.ActionListener() {
+        renameSongjButton.setText("Rename Song");
+        renameSongjButton.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                updateSongjButtonActionPerformed(evt);
+                renameSongjButtonActionPerformed(evt);
             }
         });
 
@@ -227,11 +243,11 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
                                 .addComponent(ratingjComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                                .addGap(18, 18, 18)
-                                .addComponent(updateSongjButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(canceljButton))
-                            .addComponent(titlejTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 287, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(canceljButton)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(renameSongjButton))
+                            .addComponent(titlejTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jLabel1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
@@ -239,7 +255,7 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
                         .addComponent(baseDirButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(clearRatingsjButton)))
-                .addContainerGap(42, Short.MAX_VALUE))
+                .addContainerGap(114, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -257,8 +273,8 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel4)
                             .addComponent(ratingjComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(updateSongjButton)
-                            .addComponent(canceljButton))))
+                            .addComponent(canceljButton)
+                            .addComponent(renameSongjButton))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
@@ -298,7 +314,8 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
             db.updateBaseDirectory(directoryPath);
             baseDirButton.setText(directoryPath);
             listFiles(directoryPath);
-            defaultDirectory = directoryPath;
+            defaultDirectory
+                    = directoryPath;
         } else {
             System.out.println("No Selection ");
         }
@@ -348,7 +365,7 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
         }
     }//GEN-LAST:event_canceljButtonActionPerformed
 
-    private void updateSongjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_updateSongjButtonActionPerformed
+    private void renameSongjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_renameSongjButtonActionPerformed
 
         String updatedFileName
                 = titlejTextField.getText();
@@ -414,7 +431,7 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
                     JOptionPane.ERROR_MESSAGE);
         }
 
-    }//GEN-LAST:event_updateSongjButtonActionPerformed
+    }//GEN-LAST:event_renameSongjButtonActionPerformed
 
     private void clearRatingsjButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_clearRatingsjButtonActionPerformed
         Object[] options1
@@ -614,7 +631,7 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JComboBox<String> ratingjComboBox;
+    private javax.swing.JButton renameSongjButton;
     private javax.swing.JTextField titlejTextField;
-    private javax.swing.JButton updateSongjButton;
     // End of variables declaration//GEN-END:variables
 }
