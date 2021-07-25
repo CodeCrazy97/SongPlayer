@@ -204,6 +204,11 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
         titlejTextField.setName("titlejTextField"); // NOI18N
 
         ratingjComboBox.setModel(new javax.swing.DefaultComboBoxModel<>(new String[] { "Unrated", "0", "1", "2", "3", "4", "5", "6", "7", "8", "9", "10" }));
+        ratingjComboBox.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                ratingjComboBoxActionPerformed(evt);
+            }
+        });
 
         renameSongjButton.setText("Rename Song");
         renameSongjButton.addActionListener(new java.awt.event.ActionListener() {
@@ -403,32 +408,42 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
         }
         int updatedRating
                 = ratingjComboBox.getSelectedIndex() - 1;
-        if (db.updateSong(defaultDirectory + "\\" + jTable1.getValueAt(jTable1.
-                getSelectedRow(),
-                jTable1.getSelectedColumn()).
-                toString(),
-                defaultDirectory + "\\" + updatedFileName,
-                updatedRating)) {
-//            System.out.println(jTable1.getSelectedRow());
-//            System.out.println(jTable1.getSelectedColumn());
-            jTable1.setValueAt(updatedFileName,
-                    jTable1.getSelectedRow(),
-                    0);
 
-            if (updatedRating == -1) {
-                jTable1.setValueAt("N/A",
+        try {
+            if (db.updateSongName(defaultDirectory + "\\" + jTable1.getValueAt(
+                    jTable1.
+                    getSelectedRow(),
+                    jTable1.getSelectedColumn()).
+                    toString(),
+                    defaultDirectory + "\\" + updatedFileName,
+                    updatedRating)) {
+                jTable1.setValueAt(updatedFileName,
                         jTable1.getSelectedRow(),
-                        2);
+                        0);
+
+                if (updatedRating == -1) {
+                    jTable1.setValueAt("N/A",
+                            jTable1.getSelectedRow(),
+                            2);
+                } else {
+                    jTable1.setValueAt(updatedRating,
+                            jTable1.getSelectedRow(),
+                            2);
+                }
             } else {
-                jTable1.setValueAt(updatedRating,
-                        jTable1.getSelectedRow(),
-                        2);
+                JOptionPane.showMessageDialog(null,
+                        "There was an error updating the song.",
+                        "Error Updating Song",
+                        JOptionPane.ERROR_MESSAGE);
             }
-        } else {
-            JOptionPane.showMessageDialog(null,
-                    "There was an error updating the song.",
-                    "Error Updating Song",
-                    JOptionPane.ERROR_MESSAGE);
+        } catch (IOException ioe) {
+            if (ioe.getMessage() == "file exists") {
+                JOptionPane.showMessageDialog(null,
+                        "There was an error changing the song name: " + ioe.
+                        getMessage(),
+                        "Error Renaming Song",
+                        JOptionPane.ERROR_MESSAGE);
+            }
         }
 
     }//GEN-LAST:event_renameSongjButtonActionPerformed
@@ -512,6 +527,10 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
     private void jTable1FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTable1FocusGained
 
     }//GEN-LAST:event_jTable1FocusGained
+
+    private void ratingjComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ratingjComboBoxActionPerformed
+
+    }//GEN-LAST:event_ratingjComboBoxActionPerformed
 
     // Get the files.
     public void listFiles(String myDirectoryPath) {

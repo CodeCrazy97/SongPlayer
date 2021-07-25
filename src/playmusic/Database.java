@@ -6,6 +6,7 @@
 package playmusic;
 
 import java.io.File;
+import java.io.IOException;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
@@ -28,24 +29,32 @@ public class Database {
     public Connection conn;
 
     public Database() {
-        basePath = new File("").getAbsolutePath();
-        conn = connect();
+        basePath
+                = new File("").getAbsolutePath();
+        conn
+                = connect();
     }
 
     public Connection connect() {
-        Connection conn = null;
+        Connection conn
+                = null;
         try {
 
-            String pathToDB = basePath.replace("\\", "/") + "/music.db";
-            File file = new File(pathToDB);
+            String pathToDB
+                    = basePath.replace("\\",
+                            "/") + "/music.db";
+            File file
+                    = new File(pathToDB);
             if (!file.exists()) {
                 // need to create the database
                 createNewDatabase("music.db");
             }
 
-            String url = "jdbc:sqlite:" + pathToDB;
+            String url
+                    = "jdbc:sqlite:" + pathToDB;
 
-            conn = DriverManager.getConnection(url);
+            conn
+                    = DriverManager.getConnection(url);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
         }
@@ -53,11 +62,15 @@ public class Database {
     }
 
     public void createNewDatabase(String fileName) {
-        String url = "jdbc:sqlite:" + basePath.replace("\\", "/") + "/" + fileName;
+        String url
+                = "jdbc:sqlite:" + basePath.replace("\\",
+                        "/") + "/" + fileName;
 
-        try (Connection conn = DriverManager.getConnection(url)) {
+        try (Connection conn
+                = DriverManager.getConnection(url)) {
             if (conn != null) {
-                DatabaseMetaData meta = conn.getMetaData();
+                DatabaseMetaData meta
+                        = conn.getMetaData();
                 System.out.println("The driver name is " + meta.getDriverName());
                 System.out.println("A new database has been created.");
 
@@ -78,17 +91,21 @@ public class Database {
         }
 
         // SQLite connection string
-        String url = "jdbc:sqlite:" + basePath.replace("\\", "/") + "/music.db";
+        String url
+                = "jdbc:sqlite:" + basePath.replace("\\",
+                        "/") + "/music.db";
 
         // SQL statement for creating a new table
-        String sql = "CREATE TABLE IF NOT EXISTS base_dir (\n"
+        String sql
+                = "CREATE TABLE IF NOT EXISTS base_dir (\n"
                 + "	directory varchar PRIMARY KEY,\n"
                 + "	datetime_chosen datetime DEFAULT NULL"
                 + ");";
 
         Statement stmt;
         try {
-            stmt = conn.createStatement();
+            stmt
+                    = conn.createStatement();
             stmt.execute(sql);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -103,10 +120,13 @@ public class Database {
         }
 
         // SQLite connection string
-        String url = "jdbc:sqlite:" + basePath.replace("\\", "/") + "/music.db";
+        String url
+                = "jdbc:sqlite:" + basePath.replace("\\",
+                        "/") + "/music.db";
 
         // SQL statement for creating a new table
-        String sql = "CREATE TABLE IF NOT EXISTS song_files (\n"
+        String sql
+                = "CREATE TABLE IF NOT EXISTS song_files (\n"
                 + "	file_name varchar PRIMARY KEY,\n"
                 + "	number_of_plays int DEFAULT 0,\n"
                 + "	datetime_updated datetime DEFAULT NULL,\n"
@@ -114,7 +134,8 @@ public class Database {
                 + ");";
         Statement stmt;
         try {
-            stmt = conn.createStatement();
+            stmt
+                    = conn.createStatement();
             stmt.execute(sql);
         } catch (SQLException e) {
             System.out.println(e.getMessage());
@@ -123,26 +144,35 @@ public class Database {
 
     public void updateBaseDirectory(String directory) {
         // check if a base dir was set. If not, set one. Otherwise, update the existing base directory.
-        String sql = "SELECT COUNT(*) AS `count` FROM base_dir";
+        String sql
+                = "SELECT COUNT(*) AS `count` FROM base_dir";
 
         Statement stmt;
         try {
-            stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
+            stmt
+                    = conn.createStatement();
+            ResultSet rs
+                    = stmt.executeQuery(sql);
 
             // loop through the result set
             while (rs.next()) {
                 if (rs.getInt("count") > 0) { // update pre-existing base directory
-                    String sqlUpdate = "UPDATE base_dir SET directory = ?, datetime_chosen = date('now')";
+                    String sqlUpdate
+                            = "UPDATE base_dir SET directory = ?, datetime_chosen = date('now')";
 
-                    PreparedStatement pstmt = conn.prepareStatement(sqlUpdate);
-                    pstmt.setString(1, directory);
+                    PreparedStatement pstmt
+                            = conn.prepareStatement(sqlUpdate);
+                    pstmt.setString(1,
+                            directory);
                     pstmt.executeUpdate();
                 } else { // make a brand new base directory
-                    String sqlInsert = "INSERT INTO base_dir (directory, datetime_chosen) VALUES (?,date('now'))";
+                    String sqlInsert
+                            = "INSERT INTO base_dir (directory, datetime_chosen) VALUES (?,date('now'))";
 
-                    PreparedStatement pstmt = conn.prepareStatement(sqlInsert);
-                    pstmt.setString(1, directory);
+                    PreparedStatement pstmt
+                            = conn.prepareStatement(sqlInsert);
+                    pstmt.setString(1,
+                            directory);
                     pstmt.executeUpdate();
                 }
             }
@@ -159,16 +189,21 @@ public class Database {
         }
     }
 
-    public boolean updateSong(String oldFileName, String fileName, int rating) {
+    public boolean updateSongRating(String oldFileName,
+            String fileName,
+            int rating) {
         if (rating == -1) { // N/A rating - remove it from DB
-            String sql = "DELETE FROM song_files WHERE file_name = ?";
+            String sql
+                    = "DELETE FROM song_files WHERE file_name = ?";
 
             PreparedStatement pstmt;
             try {
-                pstmt = conn.prepareStatement(sql);
+                pstmt
+                        = conn.prepareStatement(sql);
 
                 // set the corresponding param
-                pstmt.setString(1, oldFileName);
+                pstmt.setString(1,
+                        oldFileName);
                 // execute the delete statement
                 pstmt.executeUpdate();
                 return true;
@@ -180,39 +215,126 @@ public class Database {
         } else {
 
             // check if a base dir was set. If not, set one. Otherwise, update the existing base directory.
-            String sql = "SELECT COUNT(*) AS `count` FROM song_files WHERE file_name = ?";
+            String sql
+                    = "SELECT COUNT(*) AS `count` FROM song_files WHERE file_name = ?";
 
             PreparedStatement pstmt;
             try {
-                pstmt = conn.prepareStatement(sql);
+                pstmt
+                        = conn.prepareStatement(sql);
 
                 try {
-                    pstmt.setString(1, oldFileName);
+                    pstmt.setString(1,
+                            oldFileName);
                 } catch (SQLException ex) {
                     System.out.println("Error 164: " + ex.getMessage());
                 }
                 ResultSet rs;
                 try {
-                    rs = pstmt.executeQuery();
+                    rs
+                            = pstmt.executeQuery();
                     // loop through the result set
                     while (rs.next()) {
                         if (rs.getInt("count") > 0) { // update pre-existing base directory
-                            String sqlUpdate = "UPDATE song_files SET file_name = ?, datetime_updated = date('now'), rating = ? WHERE file_name = ?";
+                            String sqlUpdate
+                                    = "UPDATE song_files SET file_name = ?, datetime_updated = date('now'), rating = ? WHERE file_name = ?";
 
-                            PreparedStatement pstmt2 = conn.prepareStatement(sqlUpdate);
-                            pstmt2.setString(1, fileName);
-                            pstmt2.setInt(2, rating);
-                            pstmt2.setString(3, oldFileName);
+                            PreparedStatement pstmt2
+                                    = conn.prepareStatement(sqlUpdate);
+                            pstmt2.setString(1,
+                                    fileName);
+                            pstmt2.setInt(2,
+                                    rating);
+                            pstmt2.setString(3,
+                                    oldFileName);
 
                             pstmt2.executeUpdate();
                             return true;
 
                         } else { // make a brand new base directory
-                            String sqlInsert = "INSERT INTO song_files (file_name, datetime_updated, rating, number_of_plays) VALUES (?,date('now'), ?, 0)";
+                            String sqlInsert
+                                    = "INSERT INTO song_files (file_name, datetime_updated, rating, number_of_plays) VALUES (?,date('now'), ?, 0)";
 
-                            PreparedStatement pstmt2 = conn.prepareStatement(sqlInsert);
-                            pstmt2.setString(1, oldFileName);
-                            pstmt2.setInt(2, rating);
+                            PreparedStatement pstmt2
+                                    = conn.prepareStatement(sqlInsert);
+                            pstmt2.setString(1,
+                                    oldFileName);
+                            pstmt2.setInt(2,
+                                    rating);
+
+                            pstmt2.executeUpdate();
+                            return true;
+
+                        }
+                    }
+                } catch (SQLException ex) {
+                    System.out.println("Error 190: " + ex.getMessage());
+                }
+            } catch (SQLException ex) {
+                System.out.println("Error 193: " + ex.getMessage());
+            }
+            return false;
+        }
+    }
+
+    public boolean updateSongName(String oldFileName,
+            String fileName,
+            int rating) throws IOException {
+        if (rating == -1) { // N/A rating - rename the file. No need to delete anything from DB because it doesn't exist in there.
+            // File (or directory) with old name
+            File file
+                    = new File(oldFileName);
+
+// File with new name
+            File file2
+                    = new File(fileName);
+
+            if (file2.exists()) {
+                throw new java.io.IOException("file exists");
+            }
+
+            // Rename file (or directory)
+            boolean success
+                    = file.renameTo(file2);
+
+            if (!success) {
+                return false;
+            } else {
+                return true;
+            }
+        } else {
+
+            // check if a base dir was set. If not, set one. Otherwise, update the existing base directory.
+            String sql
+                    = "SELECT COUNT(*) AS `count` FROM song_files WHERE file_name = ?";
+
+            PreparedStatement pstmt;
+            try {
+                pstmt
+                        = conn.prepareStatement(sql);
+
+                try {
+                    pstmt.setString(1,
+                            oldFileName);
+                } catch (SQLException ex) {
+                    System.out.println("Error 164: " + ex.getMessage());
+                }
+                ResultSet rs;
+                try {
+                    rs
+                            = pstmt.executeQuery();
+                    // loop through the result set
+                    while (rs.next()) {
+                        if (rs.getInt("count") > 0) { // update pre-existing base directory
+                            String sqlUpdate
+                                    = "UPDATE song_files SET file_name = ?, datetime_updated = date('now') WHERE file_name = ?";
+
+                            PreparedStatement pstmt2
+                                    = conn.prepareStatement(sqlUpdate);
+                            pstmt2.setString(1,
+                                    fileName);
+                            pstmt2.setString(3,
+                                    oldFileName);
 
                             pstmt2.executeUpdate();
                             return true;
@@ -231,11 +353,13 @@ public class Database {
 
     public boolean resetSongRatings(boolean resetForAllDirectories) {
         if (resetForAllDirectories) {
-            String sql = "DELETE FROM song_files";
+            String sql
+                    = "DELETE FROM song_files";
 
             PreparedStatement pstmt;
             try {
-                pstmt = conn.prepareStatement(sql);
+                pstmt
+                        = conn.prepareStatement(sql);
 
                 // execute the delete statement
                 pstmt.executeUpdate();
@@ -245,14 +369,17 @@ public class Database {
                 System.out.println("Error 244: " + e.getMessage());
             }
         } else {  // only reset the ratings for the current directory
-            String sql = "DELETE FROM song_files WHERE file_name LIKE ?";
+            String sql
+                    = "DELETE FROM song_files WHERE file_name LIKE ?";
 
             PreparedStatement pstmt;
             try {
-                pstmt = conn.prepareStatement(sql);
+                pstmt
+                        = conn.prepareStatement(sql);
 
                 // set the corresponding param
-                pstmt.setString(1, getBaseDirectory() + "%");
+                pstmt.setString(1,
+                        getBaseDirectory() + "%");
                 // execute the delete statement
                 pstmt.executeUpdate();
                 return true;
@@ -270,20 +397,24 @@ public class Database {
      */
     public boolean doesTableExist(String tableName) {
 
-        String sql = "SELECT name FROM sqlite_master WHERE type='table' AND name = ?";
+        String sql
+                = "SELECT name FROM sqlite_master WHERE type='table' AND name = ?";
 
         PreparedStatement pstmt;
         try {
-            pstmt = conn.prepareStatement(sql);
+            pstmt
+                    = conn.prepareStatement(sql);
 
             try {
-                pstmt.setString(1, tableName);
+                pstmt.setString(1,
+                        tableName);
             } catch (SQLException ex) {
                 System.out.println("Error 231: " + ex.getMessage());
             }
             ResultSet rs;
             try {
-                rs = pstmt.executeQuery();
+                rs
+                        = pstmt.executeQuery();
 
                 while (rs.next()) {
                     System.out.println();
@@ -299,15 +430,19 @@ public class Database {
     }
 
     public String getBaseDirectory() {
-        String directory = null;
+        String directory
+                = null;
 
         // check if a base dir was set. If not, set one. Otherwise, update the existing base directory.
-        String sql = "SELECT directory FROM base_dir";
+        String sql
+                = "SELECT directory FROM base_dir";
 
         Statement stmt;
         try {
-            stmt = conn.createStatement();
-            ResultSet rs = stmt.executeQuery(sql);
+            stmt
+                    = conn.createStatement();
+            ResultSet rs
+                    = stmt.executeQuery(sql);
 
             while (rs.next()) {
                 return rs.getString("directory");
@@ -326,24 +461,32 @@ public class Database {
     public LinkedList<Song> getSongFiles(String directory) {
 
         // check if a base dir was set. If not, set one. Otherwise, update the existing base directory.
-        String sql = "SELECT * FROM song_files WHERE file_name LIKE ?";
+        String sql
+                = "SELECT * FROM song_files WHERE file_name LIKE ?";
 
         PreparedStatement pstmt;
-        LinkedList<Song> songs = new LinkedList<Song>();
+        LinkedList<Song> songs
+                = new LinkedList<Song>();
         try {
-            pstmt = conn.prepareStatement(sql);
+            pstmt
+                    = conn.prepareStatement(sql);
 
             try {
-                pstmt.setString(1, directory + "%");
+                pstmt.setString(1,
+                        directory + "%");
             } catch (SQLException ex) {
                 System.out.println("Error 160: " + ex.getMessage());
             }
             ResultSet rs;
             try {
-                rs = pstmt.executeQuery();
+                rs
+                        = pstmt.executeQuery();
 
                 while (rs.next()) {
-                    Song s = new Song(rs.getString("file_name"), rs.getInt("number_of_plays"), rs.getInt("rating"));
+                    Song s
+                            = new Song(rs.getString("file_name"),
+                                    rs.getInt("number_of_plays"),
+                                    rs.getInt("rating"));
                     songs.add(s);
                 }
             } catch (SQLException ex) {
@@ -351,7 +494,8 @@ public class Database {
             }
         } catch (SQLException ex) {
             System.out.println("Error 173: " + ex.getMessage());
-            if (ex.getMessage().contains("no such table: song_files")) {
+            if (ex.getMessage().
+                    contains("no such table: song_files")) {
                 // build the song_files table
                 createSongFiles();
             }
