@@ -244,15 +244,14 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jLabel3)
                             .addComponent(jLabel4))
-                        .addGap(29, 29, 29)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(ratingjComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                .addComponent(renameSongjButton)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(canceljButton)
-                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(renameSongjButton))
-                            .addComponent(titlejTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(canceljButton))
+                            .addComponent(titlejTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE)
+                            .addComponent(ratingjComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
                     .addComponent(jLabel1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
@@ -260,7 +259,7 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
                         .addComponent(baseDirButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(clearRatingsjButton)))
-                .addContainerGap(114, Short.MAX_VALUE))
+                .addContainerGap(178, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -274,18 +273,22 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(jLabel3)
                             .addComponent(titlejTextField, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addGap(9, 9, 9)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                            .addComponent(jLabel4)
-                            .addComponent(ratingjComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                             .addComponent(canceljButton)
-                            .addComponent(renameSongjButton))))
+                            .addComponent(renameSongjButton))
+                        .addGap(22, 22, 22)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                            .addGroup(layout.createSequentialGroup()
+                                .addGap(6, 6, 6)
+                                .addComponent(jLabel4))
+                            .addComponent(ratingjComboBox, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
                     .addComponent(baseDirButton)
                     .addComponent(clearRatingsjButton))
-                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addContainerGap(59, Short.MAX_VALUE))
         );
 
         jLabel3.getAccessibleContext().setAccessibleName("titlejLabel");
@@ -406,7 +409,7 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
                 return;
             }
         }
-        int updatedRating
+        int rating
                 = ratingjComboBox.getSelectedIndex() - 1;
 
         try {
@@ -416,20 +419,10 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
                     jTable1.getSelectedColumn()).
                     toString(),
                     defaultDirectory + "\\" + updatedFileName,
-                    updatedRating)) {
+                    rating)) {
                 jTable1.setValueAt(updatedFileName,
                         jTable1.getSelectedRow(),
                         0);
-
-                if (updatedRating == -1) {
-                    jTable1.setValueAt("N/A",
-                            jTable1.getSelectedRow(),
-                            2);
-                } else {
-                    jTable1.setValueAt(updatedRating,
-                            jTable1.getSelectedRow(),
-                            2);
-                }
             } else {
                 JOptionPane.showMessageDialog(null,
                         "There was an error updating the song.",
@@ -529,6 +522,28 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
     }//GEN-LAST:event_jTable1FocusGained
 
     private void ratingjComboBoxActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_ratingjComboBoxActionPerformed
+        int updatedRating
+                = ratingjComboBox.getSelectedIndex() - 1;
+        try {
+            db.updateSongRating(defaultDirectory + "\\" + titlejTextField.
+                    getText(),
+                    updatedRating);
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(null,
+                    "There was an error updating the song rating: " + e.
+                    getLocalizedMessage(),
+                    "Error Updating Song Rating",
+                    JOptionPane.ERROR_MESSAGE);
+        }
+        if (updatedRating == -1) {
+            jTable1.setValueAt("N/A",
+                    jTable1.getSelectedRow(),
+                    2);
+        } else {
+            jTable1.setValueAt(updatedRating,
+                    jTable1.getSelectedRow(),
+                    2);
+        }
 
     }//GEN-LAST:event_ratingjComboBoxActionPerformed
 

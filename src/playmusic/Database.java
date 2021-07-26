@@ -189,8 +189,7 @@ public class Database {
         }
     }
 
-    public boolean updateSongRating(String oldFileName,
-            String fileName,
+    public boolean updateSongRating(String fileName,
             int rating) {
         if (rating == -1) { // N/A rating - remove it from DB
             String sql
@@ -203,7 +202,7 @@ public class Database {
 
                 // set the corresponding param
                 pstmt.setString(1,
-                        oldFileName);
+                        fileName);
                 // execute the delete statement
                 pstmt.executeUpdate();
                 return true;
@@ -225,7 +224,7 @@ public class Database {
 
                 try {
                     pstmt.setString(1,
-                            oldFileName);
+                            fileName);
                 } catch (SQLException ex) {
                     System.out.println("Error 164: " + ex.getMessage());
                 }
@@ -246,7 +245,7 @@ public class Database {
                             pstmt2.setInt(2,
                                     rating);
                             pstmt2.setString(3,
-                                    oldFileName);
+                                    fileName);
 
                             pstmt2.executeUpdate();
                             return true;
@@ -258,7 +257,7 @@ public class Database {
                             PreparedStatement pstmt2
                                     = conn.prepareStatement(sqlInsert);
                             pstmt2.setString(1,
-                                    oldFileName);
+                                    fileName);
                             pstmt2.setInt(2,
                                     rating);
 
