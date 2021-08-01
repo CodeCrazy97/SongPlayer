@@ -129,6 +129,9 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
         renameSongjButton = new javax.swing.JButton();
         canceljButton = new javax.swing.JButton();
         clearRatingsjButton = new javax.swing.JButton();
+        playSongjButton1 = new javax.swing.JButton();
+        nextjButton1 = new javax.swing.JButton();
+        playPrevjButton2 = new javax.swing.JButton();
 
         jLabel1.setText("Songs");
 
@@ -231,6 +234,17 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
             }
         });
 
+        playSongjButton1.setText("Play");
+        playSongjButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                playSongjButton1ActionPerformed(evt);
+            }
+        });
+
+        nextjButton1.setText("Next");
+
+        playPrevjButton2.setText("Previous");
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -240,18 +254,26 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jScrollPane1, javax.swing.GroupLayout.PREFERRED_SIZE, 529, javax.swing.GroupLayout.PREFERRED_SIZE)
-                        .addGap(18, 18, 18)
-                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jLabel3)
-                            .addComponent(jLabel4))
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addGroup(layout.createSequentialGroup()
-                                .addComponent(renameSongjButton)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addComponent(jLabel3)
+                                    .addComponent(jLabel4))
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                                .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                                    .addGroup(layout.createSequentialGroup()
+                                        .addComponent(renameSongjButton)
+                                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                        .addComponent(canceljButton))
+                                    .addComponent(titlejTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE)
+                                    .addComponent(ratingjComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                            .addGroup(layout.createSequentialGroup()
+                                .addComponent(playPrevjButton2)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(canceljButton))
-                            .addComponent(titlejTextField, javax.swing.GroupLayout.PREFERRED_SIZE, 286, javax.swing.GroupLayout.PREFERRED_SIZE)
-                            .addComponent(ratingjComboBox, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)))
+                                .addComponent(playSongjButton1)
+                                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                                .addComponent(nextjButton1))))
                     .addComponent(jLabel1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
@@ -259,7 +281,7 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
                         .addComponent(baseDirButton)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(clearRatingsjButton)))
-                .addContainerGap(178, Short.MAX_VALUE))
+                .addContainerGap(187, Short.MAX_VALUE))
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -282,7 +304,12 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
                             .addGroup(layout.createSequentialGroup()
                                 .addGap(6, 6, 6)
                                 .addComponent(jLabel4))
-                            .addComponent(ratingjComboBox, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))))
+                            .addComponent(ratingjComboBox, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                        .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
+                            .addComponent(playSongjButton1)
+                            .addComponent(nextjButton1)
+                            .addComponent(playPrevjButton2))))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
@@ -547,6 +574,29 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
 
     }//GEN-LAST:event_ratingjComboBoxActionPerformed
 
+    private void playSongjButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_playSongjButton1ActionPerformed
+
+        try {
+            try {
+                //new ProcessBuilder("cmd", "/c", "start wmplayer \"C:\\Users\\Ethan\\Music\\NONAH - Jump (Official Lyric Video).mp3\"").inheritIO().start().waitFor();
+                new ProcessBuilder("cmd",
+                        "/c",
+                        "start wmplayer \"" + defaultDirectory + "\\" + titlejTextField.
+                        getText()).
+                        inheritIO().
+                        start().
+                        waitFor();
+            } catch (InterruptedException ex) {
+                System.out.println(ex.getMessage());
+                System.out.println("Error2.");
+            }
+        } catch (IOException ex) {
+            System.out.println(ex.getMessage());
+            System.out.println("Error.");
+        }
+
+    }//GEN-LAST:event_playSongjButton1ActionPerformed
+
     // Get the files.
     public void listFiles(String myDirectoryPath) {
         tableModel.getDataVector().
@@ -664,6 +714,9 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel4;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JTable jTable1;
+    private javax.swing.JButton nextjButton1;
+    private javax.swing.JButton playPrevjButton2;
+    private javax.swing.JButton playSongjButton1;
     private javax.swing.JComboBox<String> ratingjComboBox;
     private javax.swing.JButton renameSongjButton;
     private javax.swing.JTextField titlejTextField;
