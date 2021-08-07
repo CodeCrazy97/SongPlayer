@@ -46,6 +46,7 @@
                               <EmptySpace type="unrelated" max="-2" attributes="0"/>
                               <Component id="nextjButton1" min="-2" max="-2" attributes="0"/>
                           </Group>
+                          <Component id="randomPlayjButton1" alignment="0" min="-2" max="-2" attributes="0"/>
                       </Group>
                   </Group>
                   <Component id="jLabel1" min="-2" max="-2" attributes="0"/>
@@ -93,6 +94,8 @@
                           <Component id="nextjButton1" alignment="3" min="-2" max="-2" attributes="0"/>
                           <Component id="playPrevjButton2" alignment="3" min="-2" max="-2" attributes="0"/>
                       </Group>
+                      <EmptySpace max="-2" attributes="0"/>
+                      <Component id="randomPlayjButton1" min="-2" max="-2" attributes="0"/>
                   </Group>
               </Group>
               <EmptySpace max="-2" attributes="0"/>
@@ -273,6 +276,14 @@
       <Properties>
         <Property name="text" type="java.lang.String" value="Previous"/>
       </Properties>
+    </Component>
+    <Component class="javax.swing.JButton" name="randomPlayjButton1">
+      <Properties>
+        <Property name="text" type="java.lang.String" value="Random Play"/>
+      </Properties>
+      <Events>
+        <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="randomPlayjButton1ActionPerformed"/>
+      </Events>
     </Component>
   </SubComponents>
 </Form>

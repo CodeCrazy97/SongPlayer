@@ -92,6 +92,10 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
         jTable1.setAutoCreateRowSorter(true);
 
         // randomly select one of the rows
+        pickRandomSong();
+    }
+
+    public void pickRandomSong() {
         //jTable1.getRowCount();
         Random r
                 = new Random();
@@ -105,7 +109,6 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
         jTable1.setRowSelectionInterval(result,
                 result);
         displaySongInfo();
-
     }
 
     /**
@@ -132,6 +135,7 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
         playSongjButton1 = new javax.swing.JButton();
         nextjButton1 = new javax.swing.JButton();
         playPrevjButton2 = new javax.swing.JButton();
+        randomPlayjButton1 = new javax.swing.JButton();
 
         jLabel1.setText("Songs");
 
@@ -245,6 +249,13 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
 
         playPrevjButton2.setText("Previous");
 
+        randomPlayjButton1.setText("Random Play");
+        randomPlayjButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                randomPlayjButton1ActionPerformed(evt);
+            }
+        });
+
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
@@ -273,7 +284,8 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                                 .addComponent(playSongjButton1)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                                .addComponent(nextjButton1))))
+                                .addComponent(nextjButton1))
+                            .addComponent(randomPlayjButton1)))
                     .addComponent(jLabel1)
                     .addGroup(layout.createSequentialGroup()
                         .addComponent(jLabel2)
@@ -309,7 +321,9 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                             .addComponent(playSongjButton1)
                             .addComponent(nextjButton1)
-                            .addComponent(playPrevjButton2))))
+                            .addComponent(playPrevjButton2))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(randomPlayjButton1)))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
                     .addComponent(jLabel2)
@@ -575,7 +589,10 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
     }//GEN-LAST:event_ratingjComboBoxActionPerformed
 
     private void playSongjButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_playSongjButton1ActionPerformed
+        playSong();
+    }//GEN-LAST:event_playSongjButton1ActionPerformed
 
+    public void playSong() {
         try {
             try {
                 //new ProcessBuilder("cmd", "/c", "start wmplayer \"C:\\Users\\Ethan\\Music\\NONAH - Jump (Official Lyric Video).mp3\"").inheritIO().start().waitFor();
@@ -594,8 +611,12 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
             System.out.println(ex.getMessage());
             System.out.println("Error.");
         }
+    }
 
-    }//GEN-LAST:event_playSongjButton1ActionPerformed
+    private void randomPlayjButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_randomPlayjButton1ActionPerformed
+        pickRandomSong();
+        playSong();
+    }//GEN-LAST:event_randomPlayjButton1ActionPerformed
 
     // Get the files.
     public void listFiles(String myDirectoryPath) {
@@ -717,6 +738,7 @@ public class PlayMusicJPanelForm extends javax.swing.JPanel {
     private javax.swing.JButton nextjButton1;
     private javax.swing.JButton playPrevjButton2;
     private javax.swing.JButton playSongjButton1;
+    private javax.swing.JButton randomPlayjButton1;
     private javax.swing.JComboBox<String> ratingjComboBox;
     private javax.swing.JButton renameSongjButton;
     private javax.swing.JTextField titlejTextField;
